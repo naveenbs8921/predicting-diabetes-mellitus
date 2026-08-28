@@ -9,7 +9,12 @@ Click here to open the code and repository in MATLAB Online&trade;:
 
 [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=mathworks/predicting-diabetes-mellitus)
 
-## Files Overview
+## Pre-work
+We recommend participants complete the following before the event if they are not familiar with these topics:
+* [MATLAB Onramp](https://matlabacademy.mathworks.com/details/matlab-onramp/gettingstarted)
+* [Machine Learning Onramp](https://matlabacademy.mathworks.com/details/machine-learning-onramp/machinelearning)
+
+## Files
 ### PredictingDiabetesMellitus.m
 The code tutorial that will explain how to access the data and how to get started on developing and presenting your own algorithms. 
 
