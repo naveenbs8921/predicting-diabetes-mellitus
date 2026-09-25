@@ -76,12 +76,15 @@ YTrain = dataTrain.diabetes_mellitus;
 XTest = removevars(dataTest, {'diabetes_mellitus'});
 YTest = dataTest.diabetes_mellitus;
 
-% 4. Train a Robust Baseline Model (RUSBoost for Imbalanced Data)
-disp('Training RUSBoost model...');
+% 4. Train a Medical Risk Model (Random Forest with Probabilities)
+disp('Training Random Forest model...');
+% We use 'Bag' to get true percentages (probabilities).
+% We use 'Prior', 'uniform' so the model doesn't ignore the minority (diabetic) patients.
 numTrees = 50; 
 mdl = fitcensemble(XTrain, YTrain, ...
-    'Method', 'RUSBoost', ...
+    'Method', 'Bag', ...
     'NumLearningCycles', numTrees, ...
+    'Prior', 'uniform', ...
     'Learners', templateTree());
 
 % 5. Evaluate the Model
@@ -90,8 +93,8 @@ disp('Evaluating model on test data...');
 
 figure;
 confusionchart(YTest, predictedLabels);
-title('Confusion Matrix - RUSBoost Baseline');
-saveas(gcf, 'ConfusionMatrix_RUSBoost.png');
+title('Confusion Matrix - Random Forest Baseline');
+saveas(gcf, 'ConfusionMatrix_RF.png');
 
 accuracy = sum(predictedLabels == YTest) / length(YTest);
 fprintf('Model Accuracy: %.2f%%\n', accuracy * 100);
@@ -136,11 +139,13 @@ if isfile('UnlabeledWiDS2021.csv')
     
     % Predict
     disp('Predicting on unlabeled data...');
-    [unlabeledPreds, unlabeledScores] = predict(mdl, unlabeledData);
+    [~, unlabeledScores] = predict(mdl, unlabeledData);
     
-    % Kaggle expects values between 0 and 1. RUSBoost outputs raw margin scores which can be > 1.
-    % To be safe, we will submit the exact 0 or 1 predicted labels!
-    diabetes_prob = unlabeledPreds;
+    % Get the exact probability (0.0 to 1.0) of having diabetes (Class 1)
+    diabetes_prob = unlabeledScores(:, 2);
+    
+    % Round the probabilities to 3 decimal places so it isn't messy (e.g. 0.842 instead of 0.84239103)
+    diabetes_prob = round(diabetes_prob, 3);
     
     % Create submission table
     submission = table(encounter_ids, diabetes_prob, 'VariableNames', {'encounter_id', 'diabetes_mellitus'});
