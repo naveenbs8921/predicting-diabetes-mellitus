@@ -79,12 +79,16 @@ YTest = dataTest.diabetes_mellitus;
 % 4. Train a Medical Risk Model (Random Forest with Probabilities)
 disp('Training Random Forest model...');
 % We use 'Bag' to get true percentages (probabilities).
-% We use 'Prior', 'uniform' so the model doesn't ignore the minority (diabetic) patients.
+% We use a 'Cost' matrix to mathematically penalize False Negatives (missing sick patients).
+% Penalty of 1 for False Positive, Penalty of 10 for False Negative
+medicalCost = [0, 1; 
+               10, 0]; 
+
 numTrees = 50; 
 mdl = fitcensemble(XTrain, YTrain, ...
     'Method', 'Bag', ...
     'NumLearningCycles', numTrees, ...
-    'Prior', 'uniform', ...
+    'Cost', medicalCost, ...
     'Learners', templateTree());
 
 % 5. Evaluate the Model
